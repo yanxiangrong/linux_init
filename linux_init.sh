@@ -196,3 +196,23 @@ else
    
     echo "Swap configured."
 fi
+
+read -p "This script will install docker. Do you want to continue? (y/n): " answer
+if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+    echo "Docker installation skipped."
+else
+    echo "Docker installation started."
+    # Install Docker
+    apt-get update
+    apt-get install ca-certificates curl -y
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://mirrors.cloud.tencent.com/docker-ce/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    chmod a+r /etc/apt/keyrings/docker.asc
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirror.ccs.tencentyun.com/docker-ce/linux/ubuntu/ \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+
+    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    systemctl enable --now docker
+fi
